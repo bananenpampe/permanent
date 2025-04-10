@@ -65,15 +65,19 @@ static npy_complex128 ryser(PyArrayObject *submatrix) {
 
 // This is a wrapper which chooses the optimal permanent function
 static PyObject *permanent(PyObject *self, PyObject *args) {
-  // Parse the input
-  PyArrayObject *submatrix;
-  if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &submatrix)) {return NULL;}
-  if (!PyArray_ISCOMPLEX(submatrix)) {
-      PyErr_SetString(PyExc_TypeError, "Array dtype must be `complex`.");
-      return NULL;
-  }
+    // Parse the input
+    PyArrayObject *submatrix;
+    if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &submatrix)) {
+        return NULL;
+    }
+    if (!PyArray_ISCOMPLEX(submatrix)) {
+        PyErr_SetString(PyExc_TypeError, "Array dtype must be `complex`.");
+        return NULL;
+    }
 
-  // Compute the permanent
-  npy_complex128 p = ryser(submatrix);
-  return PyComplex_FromDoubles(p.real, p.imag);
+    // Compute the permanent
+    npy_complex128 p = ryser(submatrix);
+
+    // Return it as a Python complex
+    return PyComplex_FromDoubles(creal(p), cimag(p));
 }
